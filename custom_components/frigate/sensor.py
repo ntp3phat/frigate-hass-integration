@@ -43,25 +43,35 @@ async def async_setup_entry(
         if key == "detection_fps":
             entities.append(FrigateFpsSensor(coordinator, entry))
         elif key == "detectors":
-            for name in value.keys():
-                entities.append(DetectorSpeedSensor(coordinator, entry, name))
+            entities.extend(
+                DetectorSpeedSensor(coordinator, entry, name)
+                for name in value.keys()
+            )
         elif key == "gpu_usages":
-            for name in value.keys():
-                entities.append(GpuLoadSensor(coordinator, entry, name))
+            entities.extend(
+                GpuLoadSensor(coordinator, entry, name)
+                for name in value.keys()
+            )
         elif key == "service":
             # Temperature is only supported on PCIe Coral.
-            for name in value.get("temperatures", {}):
-                entities.append(DeviceTempSensor(coordinator, entry, name))
+            entities.extend(
+                DeviceTempSensor(coordinator, entry, name)
+                for name in value.get("temperatures", {})
+            )
         elif key == "cpu_usages":
             for camera in get_cameras(frigate_config):
-                entities.append(
-                    CameraProcessCpuSensor(coordinator, entry, camera, "capture")
-                )
-                entities.append(
-                    CameraProcessCpuSensor(coordinator, entry, camera, "detect")
-                )
-                entities.append(
-                    CameraProcessCpuSensor(coordinator, entry, camera, "ffmpeg")
+                entities.extend(
+                    (
+                        CameraProcessCpuSensor(
+                            coordinator, entry, camera, "capture"
+                        ),
+                        CameraProcessCpuSensor(
+                            coordinator, entry, camera, "detect"
+                        ),
+                        CameraProcessCpuSensor(
+                            coordinator, entry, camera, "ffmpeg"
+                        ),
+                    )
                 )
         else:
             entities.extend(

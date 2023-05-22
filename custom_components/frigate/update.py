@@ -28,8 +28,7 @@ async def async_setup_entry(
     """Sensor entry setup."""
     coordinator = hass.data[DOMAIN][entry.entry_id][ATTR_COORDINATOR]
 
-    entities = []
-    entities.append(FrigateContainerUpdate(coordinator, entry))
+    entities = [FrigateContainerUpdate(coordinator, entry)]
     async_add_entities(entities)
 
 
@@ -72,12 +71,7 @@ class FrigateContainerUpdate(FrigateEntity, UpdateEntity, CoordinatorEntity):  #
 
         version_hash = self.coordinator.data.get("service", {}).get("version")
 
-        if not version_hash:
-            return None
-
-        version = str(version_hash).split("-")[0]
-
-        return version
+        return None if not version_hash else str(version_hash).split("-")[0]
 
     @property
     def latest_version(self) -> str | None:

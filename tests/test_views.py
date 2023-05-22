@@ -818,9 +818,8 @@ async def test_jsmpeg_connection_reset(
         nonlocal called_once
         if called_once:
             raise ConnectionResetError
-        else:
-            called_once = True
-            return await real_send_str(*args, **kwargs)
+        called_once = True
+        return await real_send_str(*args, **kwargs)
 
     authenticated_hass_client = await hass_client()
 
@@ -903,9 +902,8 @@ async def test_mse_connection_reset(
         nonlocal called_once
         if called_once:
             raise ConnectionResetError
-        else:
-            called_once = True
-            return await real_send_str(*args, **kwargs)
+        called_once = True
+        return await real_send_str(*args, **kwargs)
 
     authenticated_hass_client = await hass_client()
 
@@ -988,9 +986,8 @@ async def test_webrtc_connection_reset(
         nonlocal called_once
         if called_once:
             raise ConnectionResetError
-        else:
-            called_once = True
-            return await real_send_str(*args, **kwargs)
+        called_once = True
+        return await real_send_str(*args, **kwargs)
 
     authenticated_hass_client = await hass_client()
 

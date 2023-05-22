@@ -154,11 +154,9 @@ class FrigateCamera(FrigateMQTTEntity, Camera):  # type: ignore[misc]
             in self._frigate_config.get("go2rtc", {}).get("streams", {}).keys()
         ):
             self._restream_type = "rtsp"
-            streaming_template = config_entry.options.get(
+            if streaming_template := config_entry.options.get(
                 CONF_RTSP_URL_TEMPLATE, ""
-            ).strip()
-
-            if streaming_template:
+            ).strip():
                 # Can't use homeassistant.helpers.template as it requires hass which
                 # is not available in the constructor, so use direct jinja2
                 # template instead. This means templates cannot access HomeAssistant
@@ -173,11 +171,9 @@ class FrigateCamera(FrigateMQTTEntity, Camera):  # type: ignore[misc]
 
         elif self._camera_config.get("rtmp", {}).get("enabled"):
             self._restream_type = "rtmp"
-            streaming_template = config_entry.options.get(
+            if streaming_template := config_entry.options.get(
                 CONF_RTMP_URL_TEMPLATE, ""
-            ).strip()
-
-            if streaming_template:
+            ).strip():
                 # Can't use homeassistant.helpers.template as it requires hass which
                 # is not available in the constructor, so use direct jinja2
                 # template instead. This means templates cannot access HomeAssistant
@@ -237,10 +233,7 @@ class FrigateCamera(FrigateMQTTEntity, Camera):  # type: ignore[misc]
     @property
     def supported_features(self) -> int:
         """Return supported features of this camera."""
-        if not self._attr_is_streaming:
-            return 0
-
-        return cast(int, CameraEntityFeature.STREAM)
+        return cast(int, CameraEntityFeature.STREAM) if self._attr_is_streaming else 0
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
@@ -260,9 +253,7 @@ class FrigateCamera(FrigateMQTTEntity, Camera):  # type: ignore[misc]
 
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
-        if not self._attr_is_streaming:
-            return None
-        return self._stream_source
+        return None if not self._attr_is_streaming else self._stream_source
 
     async def async_enable_motion_detection(self) -> None:
         """Enable motion detection for this camera."""
@@ -312,11 +303,9 @@ class BirdseyeCamera(FrigateEntity, Camera):  # type: ignore[misc]
         self._attr_is_streaming = True
         self._attr_is_recording = False
 
-        streaming_template = config_entry.options.get(
+        if streaming_template := config_entry.options.get(
             CONF_RTSP_URL_TEMPLATE, ""
-        ).strip()
-
-        if streaming_template:
+        ).strip():
             # Can't use homeassistant.helpers.template as it requires hass which
             # is not available in the constructor, so use direct jinja2
             # template instead. This means templates cannot access HomeAssistant
@@ -453,6 +442,4 @@ class FrigateMqttSnapshots(FrigateMQTTEntity, Camera):  # type: ignore[misc]
     @property
     def state(self) -> str:
         """Return the camera state."""
-        if self._last_image is None:
-            return STATE_IDLE
-        return STATE_DETECTED
+        return STATE_IDLE if self._last_image is None else STATE_DETECTED
