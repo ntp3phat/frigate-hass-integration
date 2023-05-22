@@ -45,9 +45,7 @@ def get_default_config_entry(hass: HomeAssistant) -> ConfigEntry | None:
     default and the user must specify explicitly which instance they want.
     """
     frigate_entries = hass.config_entries.async_entries(DOMAIN)
-    if len(frigate_entries) == 1:
-        return frigate_entries[0]
-    return None
+    return frigate_entries[0] if len(frigate_entries) == 1 else None
 
 
 def get_frigate_instance_id(config: dict[str, Any]) -> str | None:
@@ -78,8 +76,9 @@ def get_client_for_frigate_instance_id(
 ) -> FrigateApiClient | None:
     """Get a client for a given frigate_instance_id."""
 
-    config_entry = get_config_entry_for_frigate_instance_id(hass, frigate_instance_id)
-    if config_entry:
+    if config_entry := get_config_entry_for_frigate_instance_id(
+        hass, frigate_instance_id
+    ):
         return cast(
             FrigateApiClient,
             hass.data[DOMAIN].get(config_entry.entry_id, {}).get(ATTR_CLIENT),
@@ -274,9 +273,7 @@ class NotificationsProxyView(ProxyView):
         if path == "snapshot.jpg":
             return f"api/events/{event_id}/snapshot.jpg"
 
-        if path.endswith("clip.mp4"):
-            return f"api/events/{event_id}/clip.mp4"
-        return None
+        return f"api/events/{event_id}/clip.mp4" if path.endswith("clip.mp4") else None
 
     def _permit_request(
         self, request: web.Request, config_entry: ConfigEntry, **kwargs: Any
@@ -512,11 +509,11 @@ class WebRTCProxyView(WebsocketProxyView):
 
 def _init_header(request: web.Request) -> CIMultiDict | dict[str, str]:
     """Create initial header."""
-    headers = {}
-
-    # filter flags
-    for name, value in request.headers.items():
-        if name in (
+    headers = {
+        name: value
+        for name, value in request.headers.items()
+        if name
+        not in (
             hdrs.CONTENT_LENGTH,
             hdrs.CONTENT_ENCODING,
             hdrs.SEC_WEBSOCKET_EXTENSIONS,
@@ -524,10 +521,8 @@ def _init_header(request: web.Request) -> CIMultiDict | dict[str, str]:
             hdrs.SEC_WEBSOCKET_VERSION,
             hdrs.SEC_WEBSOCKET_KEY,
             hdrs.HOST,
-        ):
-            continue
-        headers[name] = value
-
+        )
+    }
     # Set X-Forwarded-For
     forward_for = request.headers.get(hdrs.X_FORWARDED_FOR)
     assert request.transport

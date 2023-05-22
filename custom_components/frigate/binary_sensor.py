@@ -35,15 +35,10 @@ async def async_setup_entry(
     """Binary sensor entry setup."""
     frigate_config = hass.data[DOMAIN][entry.entry_id][ATTR_CONFIG]
 
-    entities = []
-
-    # add object sensors for cameras and zones
-    entities.extend(
-        [
-            FrigateObjectOccupancySensor(entry, frigate_config, cam_name, obj)
-            for cam_name, obj in get_cameras_zones_and_objects(frigate_config)
-        ]
-    )
+    entities = [
+        FrigateObjectOccupancySensor(entry, frigate_config, cam_name, obj)
+        for cam_name, obj in get_cameras_zones_and_objects(frigate_config)
+    ]
 
     # add generic motion sensors for cameras
     entities.extend(

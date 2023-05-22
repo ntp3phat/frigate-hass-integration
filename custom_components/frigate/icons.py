@@ -64,7 +64,4 @@ def get_icon_from_type(obj_type: str) -> str:
         return ICON_BICYCLE
     if obj_type == "cow":
         return ICON_COW
-    if obj_type == "horse":
-        return ICON_HORSE
-
-    return ICON_OTHER
+    return ICON_HORSE if obj_type == "horse" else ICON_OTHER

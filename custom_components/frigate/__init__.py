@@ -88,12 +88,7 @@ def get_friendly_name(name: str) -> str:
 
 def get_cameras(config: dict[str, Any]) -> set[str]:
     """Get cameras."""
-    cameras = set()
-
-    for cam_name, _ in config["cameras"].items():
-        cameras.add(cam_name)
-
-    return cameras
+    return {cam_name for cam_name, _ in config["cameras"].items()}
 
 
 def get_cameras_and_objects(
@@ -206,7 +201,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Remove old devices associated with cameras that have since been removed
     # from the Frigate server, keeping the 'master' device for this config
     # entry.
-    current_devices: set[tuple[str, str]] = set({get_frigate_device_identifier(entry)})
+    current_devices: set[tuple[str, str]] = {get_frigate_device_identifier(entry)}
     for item in get_cameras_and_zones(config):
         current_devices.add(get_frigate_device_identifier(entry, item))
 
@@ -229,10 +224,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         unique_id = get_frigate_entity_unique_id(
             entry.entry_id, SWITCH_DOMAIN, f"{camera}_clips"
         )
-        entity_id = entity_registry.async_get_entity_id(
+        if entity_id := entity_registry.async_get_entity_id(
             SWITCH_DOMAIN, DOMAIN, unique_id
-        )
-        if entity_id:
+        ):
             entity_registry.async_remove(entity_id)
 
     # Remove old `camera_image_height` option.
@@ -248,10 +242,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             "motion_sensor",
             f"{cam_name}_{obj_name}",
         )
-        entity_id = entity_registry.async_get_entity_id(
+        if entity_id := entity_registry.async_get_entity_id(
             "binary_sensor", DOMAIN, unique_id
-        )
-        if entity_id:
+        ):
             entity_registry.async_remove(entity_id)
 
     # Rename / change ID of object count sensors.

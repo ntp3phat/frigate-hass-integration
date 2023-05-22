@@ -34,7 +34,7 @@ def get_config_entry_title(url_str: str) -> str:
     # Strip the scheme from the URL as it's not that interesting in the title
     # and space is limited on the integrations page.
     url = URL(url_str)
-    return str(url)[len(url.scheme + "://") :]
+    return str(url)[len(f"{url.scheme}://"):]
 
 
 class FrigateFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg,misc]

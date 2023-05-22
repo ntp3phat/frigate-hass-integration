@@ -47,12 +47,13 @@ async def async_setup_entry(
     # add motion configurations for cameras
     for cam_name in get_cameras(frigate_config):
         entities.extend(
-            [FrigateMotionContourArea(entry, frigate_config, cam_name, False)]
+            [
+                FrigateMotionContourArea(
+                    entry, frigate_config, cam_name, False
+                ),
+                FrigateMotionThreshold(entry, frigate_config, cam_name, False),
+            ]
         )
-        entities.extend(
-            [FrigateMotionThreshold(entry, frigate_config, cam_name, False)]
-        )
-
     async_add_entities(entities)
 
 
